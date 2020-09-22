@@ -56,7 +56,7 @@ Cutin    <-2020
 ## GS table of projection done in 2018    (kemr øryggisstadlar)
 
 
-BEXP_2018 = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0150/BEXP18.px"
+BEXP_2020_f = "http://bank.stat.gl/api/v1/da/Greenland/BE/BE01/BE0150/BEXP20.PX"
 
 # Historical data where we get registered to 2019
 
@@ -66,7 +66,7 @@ BEXP_2019 = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0120/BEXST1.PX"
 ## Varibels in tabels need 2 list due to not same name convention which is lousy discipline by GS
 
 
-Var_List_2018 <- list("version"=c("*"),
+Var_List_2020_f <- list("version"=c("*"),
                     "place of birth"=c("*"),
                     "age"=c("*"),
                     "sex"=c("*"),
@@ -81,29 +81,29 @@ Var_List_2019 <- list("residence"=c("*"),
 
 ##############################################################################
 
-pxq_2018 <- pxweb_query(Var_List_2018)
+pxq_2020_f <- pxweb_query(Var_List_2020_f)
 pxq_2019 <- pxweb_query(Var_List_2019)
 
 ##############################################################################
 
-tabel_2018 <- pxweb_get(url =BEXP_2018,pxq_2018)
+tabel_2020_f <- pxweb_get(url =BEXP_2020_f,pxq_2020_f)
 tabel_2019 <- pxweb_get(url =BEXP_2019,pxq_2019)
 
-BeProg_2018<- as.data.frame(tabel_2018,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
+BeProg_2020_f<- as.data.frame(tabel_2020_f,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
 BeProg_2019<- as.data.frame(tabel_2019,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
 
 
 ## We choice 2018 main alternative
 
-BeProg_2018<-BeProg_2018%>%filter(version=="2018 main alternative")
+BeProg_2020_f<-BeProg_2020_f%>%filter(version=="2020 main alternative")
 
 ##  Convert to right format 
 
-FinalBeprog<-BeProg_2018%>%filter(time>=Cutin)%>%transmute(sex,alder=as.numeric(age),t=as.numeric(time),nb=`Populationforecast 2018`,birthplace=if_else(`place of birth`=="Born in Greenland","Greenland","Total"))
+FinalBeprog2020_f<-BeProg_2020_f%>%filter(time>=Cutin)%>%transmute(sex,alder=as.numeric(age),t=as.numeric(time),nb=`Befolkningsfremskrivning 2020`,birthplace=if_else(`place of birth`=="Born in Greenland","Greenland","Total"))
 
 ## Cutoff the forecast
 
-FinalBeprog_2018<-FinalBeprog%>%filter(t<=Cutoff)                                                                                     
+FinalBeprog2020_f<-FinalBeprog2020_f%>%filter(t<=Cutoff)                                                                                     
 
 
 ## Get the historical data
@@ -119,7 +119,7 @@ FinalBeprog_2019<-BeProg_2019%>%filter(birthplace%in%c("Greenland","Total"))
 
 ## Combine the historical and the 
 
-FinalBeprog<-rbind(FinalBeprog_2019,FinalBeprog_2018)
+FinalBeprog<-rbind(FinalBeprog_2019,FinalBeprog2020_f)
 
 
 
