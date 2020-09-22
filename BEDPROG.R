@@ -54,6 +54,7 @@ Cutin    <-2020
 ## GS table of projection done in 2018    (kemr øryggisstadlar)
 
 
+#
 #BEXP_2018 = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0150/BEXP18.px"
 BEXP_2020_f = "http://bank.stat.gl/api/v1/da/Greenland/BE/BE01/BE0150/BEXP20.PX"
 # Historical data where we get registered to 2019
