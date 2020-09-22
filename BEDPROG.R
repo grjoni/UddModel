@@ -62,7 +62,7 @@ BEXP_2020_f = "http://bank.stat.gl/api/v1/da/Greenland/BE/BE01/BE0150/BEXP20.PX"
 BEXP_2020_h = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0120/BEXST1.PX"
 
 
-## Varibels in tabels need 2 list due to not same name convention which is lousy discipline by GS
+## Varibels in tabels need 2 list due to not same name convention which is lousy discipline by GS checj
 
 
 Var_List_2020_f <- list("version"=c("*"),
