@@ -9,7 +9,7 @@ library(xlsx)
 
 ## Get the OFXKRDS table
 
-IN_DIR<-"X:/OED/Holdbarhedsmodel/Model_udenfor/UddModel"
+IN_DIR<-"C:/Users/shbj/Documents/UddModel"
 setwd(IN_DIR)
 
 #OFDREAI
@@ -65,7 +65,7 @@ d1<-dd22%>%transmute(generation=as.integer(generation),
 summary(d1)
 
 tb <- aggregate(nb~hændelsestype+t, data = subset(d1, generation == 1985 & trekant.Lexis. == 'Type 2'),FUN=sum)
-xtabs(nb~t+hændelestype,data=tb)
+xtabs(nb~t+hændelsestype,data=tb)
 
 tb <- aggregate(nb~t+hændelsestype, data = subset(d1,trekant.Lexis. == 'Type 2'), FUN = sum)
 xtabs(nb~t+hændelsestype,data=tb)
@@ -89,5 +89,5 @@ sapply(d2,class)
 
 
 
-save(d2, file = paste0(IN_DIR,'/Model_data/BEDCALC.RData'))
+save(d2, file = paste0(IN_DIR,'/Model_data/bef_regnskab.RData'))
 

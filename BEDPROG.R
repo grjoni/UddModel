@@ -44,7 +44,7 @@ library(xlsx)
 #####################################################################################################
 
 
-IN_DIR<-"X:/OED/Holdbarhedsmodel/Model_udenfor/UddModel"
+IN_DIR<-"C:/Users/shbj/Documents/UddModel"
 setwd(IN_DIR)
 
 Cutoff   <-2050 

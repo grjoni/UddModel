@@ -18,9 +18,9 @@ library(xlsx)
 
 ## drive
 
+IN_DIR<-"C:/Users/shbj/Documents/UddModel"
 
 
-IN_DIR<-"X:/OED/Holdbarhedsmodel/Model_udenfor/UddModel"
 setwd(IN_DIR)
 
 
