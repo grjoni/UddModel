@@ -10,6 +10,9 @@ library(xlsx)
 ## Get the OFXKRDS table
 
 IN_DIR<-"C:/Users/shbj/Documents/UddModel"
+
+CREENBANK<-"http://bank.stat.gl/api/v1/en/Greenland/BE/BE80/BEXCALC.PX"
+
 setwd(IN_DIR)
 
 #OFDREAI
@@ -26,9 +29,11 @@ list_variable <- list("generation"=c("*"),
 
 pxq_ofdrei <- pxweb_query(list_variable)
 
+k <- pxweb(CREENBANK)
+k$config$max_values_to_download <-10000 #values per call by default
+mydata_ofdrei<- pxweb_get(k,pxq_ofdrei)
 
-
-mydata_ofdrei <- pxweb_get(url = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE80/BEXCALC.PX",pxq_ofdrei)
+#mydata_ofdrei <- pxweb_get(url = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE80/BEXCALC.PX",pxq_ofdrei)
                                                                                           
                                                                                           # Get rid of categorial type  
 
