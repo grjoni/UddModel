@@ -53,73 +53,78 @@ Cutin    <-2020
 
 
 
-## GS table of projection done in 2018    (kemr øryggisstadlar)
+## GS projection in 2020 
 
 
-BEXP_2020_f = "http://bank.stat.gl/api/v1/da/Greenland/BE/BE01/BE0150/BEXP20.PX"
+BEXP_2020_f = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0150/BEXP20.PX"
 
-# Historical data where we get registered to 2019
+# Historical data where we get registered to 2020
 
-BEXP_2019 = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0120/BEXST1.PX"
+BEXP_2020 = "http://bank.stat.gl/api/v1/en/Greenland/BE/BE01/BE0120/BEXST1.PX"
 
 
 ## Varibels in tabels need 2 list due to not same name convention which is lousy discipline by GS
 
 
-Var_List_2020_f <- list("version"=c("*"),
+Var_List_2020_f <- list("version"=c("0"),   ## '0'=hovedalternativ
                     "place of birth"=c("*"),
                     "age"=c("*"),
                     "sex"=c("*"),
                     "time"=c("*"))
 ############################################################################
 
-Var_List_2019 <- list("residence"=c("*"),
+Var_List_2020 <- list("residence"=c("0"),
                  "place of birth"=c("*"),
-                 "gender"=c("*"),
+                 "gender"=c("M","K"),
                  "age"=c("*"),
                  "time"=c("*"))
 
 ##############################################################################
 
 pxq_2020_f <- pxweb_query(Var_List_2020_f)
-pxq_2019 <- pxweb_query(Var_List_2019)
+pxq_2020 <- pxweb_query(Var_List_2020)
 
 ##############################################################################
 
-tabel_2020_f <- pxweb_get(url =BEXP_2020_f,pxq_2020_f)
-tabel_2019 <- pxweb_get(url =BEXP_2019,pxq_2019)
+## Issue with max extract data in batches
+
+k <- pxweb(BEXP_2020_f)
+k$config$max_values_to_download <-10000 #values per call by default
+tabel_2020_f <- pxweb_get(k,pxq_2020_f)
+
+
+########### Realiseret
+
+h <- pxweb(BEXP_2020)
+h$config$max_values_to_download <-100000 #values per call by default
+tabel_2020 <- pxweb_get(h,pxq_2020)
+
+
 
 BeProg_2020_f<- as.data.frame(tabel_2020_f,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
-BeProg_2019<- as.data.frame(tabel_2019,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
+BeProg_2020<- as.data.frame(tabel_2020,column.name.type = "code", variable.value= "code",stringsAsFactors = FALSE)
 
 
-## We choice 2018 main alternative
 
-BeProg_2020_f<-BeProg_2020_f%>%filter(version=="2020 main alternative")
 
 ##  Convert to right format 
 
-FinalBeprog2020_f<-BeProg_2020_f%>%filter(time>=Cutin)%>%transmute(sex,alder=as.numeric(age),t=as.numeric(time),nb=`Befolkningsfremskrivning 2020`,birthplace=if_else(`place of birth`=="Born in Greenland","Greenland","Total"))
+FinalBeprog2020_f<-BeProg_2020_f%>%filter(time>=Cutin)%>%transmute(sex,alder=as.numeric(age),t=as.numeric(time),nb=`Populationforecast 2020`,birthplace=if_else(`place of birth`=="Born in Greenland","Greenland","Total"))
 
 ## Cutoff the forecast
 
 FinalBeprog2020_f<-FinalBeprog2020_f%>%filter(t<=Cutoff)                                                                                     
 
 
-## Get the historical data
-
-## Take Total
-BeProg_2019<-BeProg_2019%>%filter(residence=="Total")
-
 ## Make formatering
 
-BeProg_2019<-BeProg_2019%>%transmute(sex=gender,alder=as.numeric(age),t=as.numeric(time),nb=`Population January 1st`,birthplace=`place of birth`)
-BeProg_2019<-BeProg_2019%>%filter(sex%in%c("Men","Women"))
-FinalBeprog_2019<-BeProg_2019%>%filter(birthplace%in%c("Greenland","Total"))
+BeProg_2020<-BeProg_2020%>%transmute(sex=gender,alder=as.numeric(age),t=as.numeric(time),nb=`Population January 1st`,birthplace=`place of birth`)
+BeProg_2020<-BeProg_2020%>%filter(sex%in%c("Men","Women"))
+FinalBeprog_2020<-BeProg_2020%>%filter(birthplace%in%c("Greenland","Total"))
 
 ## Combine the historical and the 
 
-FinalBeprog<-rbind(FinalBeprog_2019,FinalBeprog2020_f)
+FinalBeprog<-rbind(FinalBeprog_2020,FinalBeprog2020_f)
 
 
 
@@ -129,18 +134,13 @@ FinalBeprog<-rbind(FinalBeprog_2019,FinalBeprog2020_f)
 
 FinalBeprog$faar <- FinalBeprog$t - FinalBeprog$alder
 
-FinalBe_2019<-FinalBeprog %>% arrange(sex,birthplace,faar,t) %>% group_by(sex,birthplace,faar, add = F) %>% mutate(nb_lag = lag(nb))%>%ungroup()
+FinalBe_2020<-FinalBeprog %>% arrange(sex,birthplace,faar,t) %>% group_by(sex,birthplace,faar, add = F) %>% mutate(nb_lag = lag(nb))%>%ungroup()
 
 ## It is possible to extract danish but some issue therefore use the english version and convert to danish 
 ## names. Here is small letter for women (kvinder)
 
-d2<-FinalBe_2019%>%transmute(køn=factor(if_else(sex=="Men","mænd","kvinder")),alder=as.integer(alder),fødested=
+d2<-FinalBe_2020%>%transmute(køn=factor(if_else(sex=="Men","mænd","kvinder")),alder=as.integer(alder),fødested=
                                                factor(if_else(birthplace=="Total","Hele befolkningen","Personer født i Grønland")),nb=as.integer(nb),t,faar,nb_lag=as.integer(nb_lag))
-
-
-d2<-FinalBe_2019%>%transmute(køn=factor(if_else(sex=="Men","mænd","kvinder")),alder=as.integer(alder),fødested=
-                               factor(if_else(birthplace=="Total","Hele befolkningen","Personer født i Grønland")),nb=as.integer(nb),t,faar,nb_lag=as.integer(nb_lag))
-
 
 
 
